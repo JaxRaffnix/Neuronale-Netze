@@ -1,7 +1,7 @@
 from builtins import range
 from builtins import object
 import numpy as np
-from past.builtins import xrange
+# from past.builtins import xrange
 
 
 class KNearestNeighbor(object):
@@ -76,7 +76,11 @@ class KNearestNeighbor(object):
                 # not use a loop over dimension, nor use np.linalg.norm().          #
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)****
-                pass
+                test_value = X[i]
+                train_values = self.X_train[j] 
+                diff = test_value - train_values
+                dists[i, j] = np.sqrt(np.sum(np.pow(diff, 2)))
+                # pass
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -157,7 +161,10 @@ class KNearestNeighbor(object):
             # Hint: Look up the function numpy.argsort.                             #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-            pass
+
+            closest_y_indices = np.argsort(dists[i], )[:k]
+            closest_y = self.y_train[closest_y_indices]
+
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
             # TODO:                                                                 #
@@ -167,7 +174,11 @@ class KNearestNeighbor(object):
             # label.                                                                #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-            pass
+            
+            found_labels, counts = np.unique(closest_y, return_counts=True, sorted=True)
+            
+            y_pred[i] = found_labels[np.argmax(counts)]
+
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
         return y_pred
