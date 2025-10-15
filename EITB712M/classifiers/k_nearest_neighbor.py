@@ -80,7 +80,6 @@ class KNearestNeighbor(object):
                 train_values = self.X_train[j] 
                 diff = test_value - train_values
                 dists[i, j] = np.sqrt(np.sum(np.pow(diff, 2)))
-                # pass
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -102,7 +101,11 @@ class KNearestNeighbor(object):
             # Do not use np.linalg.norm().                                        #
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-            pass
+
+            test_value = X[i]
+            diffs = test_value - self.X_train
+            dists[i] = np.sqrt(np.sum(np.pow(diffs, 2), axis=1))
+
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -130,7 +133,11 @@ class KNearestNeighbor(object):
         #       and two broadcast sums.                                         #
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-        pass
+
+        # we rewrite diffs from $|| x-y ||^2$ as $||x||^2 + ||y||^2 - 2xy$
+
+        diffs = np.sum(np.square(X), axis=1, keepdims=True) + np.sum(np.square(self.X_train), axis=1) - 2 * np.dot(X, self.X_train.T)
+        dists = np.sqrt(diffs)
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
