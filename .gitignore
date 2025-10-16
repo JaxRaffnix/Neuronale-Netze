@@ -1,3 +1,6 @@
+# local project files
+Abgaben/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
