@@ -4,7 +4,7 @@ from builtins import range
 from builtins import object
 import numpy as np
 from EITB712M.classifiers.linear_svm import *
-from past.builtins import xrange
+# from past.builtins import xrange
 
 
 class LinearClassifier(object):
@@ -56,7 +56,7 @@ class LinearClassifier(object):
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
 
-            pass
+            self.W -= learning_rate * grad
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
@@ -88,7 +88,7 @@ class LinearClassifier(object):
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        y_pred = np.argmax(X.dot(self.W), axis=1)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ###########################################################################
