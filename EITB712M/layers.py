@@ -71,6 +71,11 @@ def affine_backward(dout, cache):
     dw = x_reshaped.T.dot(dout)
     db = np.sum(dout, axis=0)
 
+    if db is None: 
+        raise ValueError("db is None")
+    if dw is None:
+        raise ValueError("dw is None")
+
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -125,6 +130,224 @@ def relu_backward(dout, cache):
     dx = np.where(x > 0, dout, 0)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    ###########################################################################
+    #                             END OF YOUR CODE                            #
+    ###########################################################################
+    return dx
+
+def conv_forward_naive(x, w, b, conv_param):
+    """
+    A naive implementation of the forward pass for a convolutional layer.
+
+    The input consists of N data points, each with C channels, height H and
+    width W. We convolve each input with F different filters, where each filter
+    spans all C channels and has height HF and width WF.
+
+    Input:
+    - x: Input data of shape (N, C, H, W)
+    - w: Filter weights of shape (F, C, HF, WF)
+    - b: Biases, of shape (F,)
+    - conv_param: A dictionary with the following keys:
+      - 'stride': The number of pixels between adjacent receptive fields in the
+        horizontal and vertical directions.
+      - 'pad': The number of pixels that will be used to zero-pad the input.
+
+    During padding, 'pad' zeros should be placed symmetrically (i.e equally on both sides)
+    along the height and width axes of the input. Be careful not to modfiy the original
+    input x directly.
+
+    Returns a tuple of:
+    - out: Output data, of shape (N, F, H', W') where H' and W' are given by
+      H' = 1 + (H + 2 * pad - HF) / stride
+      W' = 1 + (W + 2 * pad - WF) / stride
+    - cache: (x, w, b, conv_param)
+    """
+    out = None
+    # Extract shapes and constants
+    pad = conv_param['pad']
+    stride = conv_param['stride']
+    N, C, H, W = x.shape
+    F, C, FH, FW = w.shape
+
+    ###########################################################################
+    # TODO: Implement the convolutional forward pass.                         #
+    # Hint: you can use the function np.pad for padding.                      #
+    ###########################################################################
+
+    H_out = 1+ (H +2 * pad - FH) // stride
+    W_out = 1 + (W + 2 * pad - FW) // stride
+    assert (H + 2 * pad - FH) % stride == 0, 'Non-integer H_out'
+    assert (W + 2 * pad - FW) % stride == 0, 'Non-integer W_out'
+
+    out = np.zeros((N, F, H_out, W_out))
+
+    x_pad = np.pad(x, mode="constant", constant_values=0, pad_width=((0,0), (0,0), (pad,pad), (pad,pad)))
+
+    for n in range(N):
+        for f in range(F):
+            for h in range(H_out):
+                for wo in range(W_out):
+                    h_start = h * stride
+                    w_start = wo *stride
+                    x_slice = x_pad[n, :, h_start:h_start+FH, w_start:w_start+FW]
+                    out[n, f, h, wo] = np.sum(x_slice * w[f]) + b[f]
+
+    ###########################################################################
+    #                             END OF YOUR CODE                            #
+    ###########################################################################
+    cache = (x_pad, w, b, conv_param)
+    return out, cache
+
+
+def conv_backward_naive(dout, cache):
+    """
+    A naive implementation of the backward pass for a convolutional layer.
+
+    Inputs:
+    - dout: Upstream derivatives.
+    - cache: A tuple of (x, w, b, conv_param) as in conv_forward_naive
+
+    Returns a tuple of:
+    - dx: Gradient with respect to x
+    - dw: Gradient with respect to w
+    - db: Gradient with respect to b
+    """
+    dx, dw, db = None, None, None
+    # Extract shapes and constants
+    x_pad, w, b, conv_param = cache
+    N, F, outH, outW = dout.shape
+    N, C, Hpad, Wpad = x_pad.shape
+    HF, WF = w.shape[2], w.shape[3]
+    ###########################################################################
+    # TODO: Implement the convolutional backward pass.                        #
+    ###########################################################################
+
+    pad = conv_param['pad']
+    stride = conv_param['stride']
+    dx_pad = np.zeros_like(x_pad)
+    dw = np.zeros_like(w)
+    db = np.zeros_like(b)
+
+    db = np.sum(dout, axis=(0, 2, 3))
+
+    for n in range(N):
+      for f in range(F):
+          for h in range(outH):
+              for wo in range(outW):
+                  h_start = h * stride
+                  w_start = wo *stride
+                  x_slice = x_pad[n, :, h_start:h_start+HF, w_start:w_start+WF]    
+
+                  dw[f] += x_slice * dout[n, f, h, wo]
+
+                  dx_pad[n, :, h_start:h_start+HF, w_start:w_start+WF] += w[f] * dout[n, f, h, wo]
+
+    dx = dx_pad[:, :, pad:-pad, pad:-pad] if pad > 0 else dx_pad
+
+    ###########################################################################
+    #                             END OF YOUR CODE                            #
+    ###########################################################################
+    return dx, dw, db
+
+
+def max_pool_forward_naive(x, pool_param):
+    """
+    A naive implementation of the forward pass for a max-pooling layer.
+
+    Inputs:
+    - x: Input data, of shape (N, C, H, W)
+    - pool_param: dictionary with the following keys:
+      - 'pool_height': The height of each pooling region
+      - 'pool_width': The width of each pooling region
+      - 'stride': The distance between adjacent pooling regions
+
+    No padding is necessary here. Output size is given by
+
+    Returns a tuple of:
+    - out: Output data, of shape (N, C, H', W') where H' and W' are given by
+      H' = 1 + (H - pool_height) / stride
+      W' = 1 + (W - pool_width) / stride
+    - cache: (x, pool_param)
+    """
+    out = None
+
+    # Extract shapes and constants
+    N, C, H, W = x.shape
+    HF = pool_param.get('pool_height', 2)
+    WF = pool_param.get('pool_width', 2)
+    stride = pool_param.get('stride', 2)
+
+    ###########################################################################
+    # TODO: Implement the max-pooling forward pass                            #
+    ###########################################################################
+
+    H_out = 1 + (H - HF) // stride
+    W_out = 1 + (W - WF) // stride
+    assert (H - HF) % stride == 0, 'Non-integer H_out'
+    assert (W - WF) % stride == 0, 'Non-integer W_out'
+
+    out = np.zeros((N, C, H_out, W_out))
+
+    for n in range(N):           # batch
+        for c in range(C):      
+            for h in range(H_out):
+                for wo in range(W_out):
+                    h_start = h * stride
+                    w_start = wo * stride
+                    h_end = h_start + HF
+                    w_end = w_start + WF
+
+                    x_slice = x[n, c, h_start:h_end, w_start:w_end]
+                    out[n, c, h, wo] = np.max(x_slice)
+
+    ###########################################################################
+    #                             END OF YOUR CODE                            #
+    ###########################################################################
+    cache = (x, pool_param)
+    return out, cache
+
+
+def max_pool_backward_naive(dout, cache):
+    """
+    A naive implementation of the backward pass for a max-pooling layer.
+
+    Inputs:
+    - dout: Upstream derivatives
+    - cache: A tuple of (x, pool_param) as in the forward pass.
+
+    Returns:
+    - dx: Gradient with respect to x
+    """
+    dx = None
+    # Extract constants and shapes
+    x, pool_param = cache
+    N, C, H, W = x.shape
+    HF = pool_param.get('pool_height', 2)
+    WF = pool_param.get('pool_width', 2)
+    stride = pool_param.get('stride', 2)
+    ###########################################################################
+    # TODO: Implement the max-pooling backward pass                           #
+    ###########################################################################
+
+    H_out = 1 + (H - HF) // stride
+    W_out = 1 + (W - WF) // stride
+    dx = np.zeros_like(x)
+
+    for n in range(N):           # batch
+        for c in range(C):      
+            for h in range(H_out):
+                for wo in range(W_out):
+                  h_start = h * stride
+                  w_start = wo * stride
+                  h_end = h_start + HF
+                  w_end = w_start + WF
+
+                  x_slice = x[n, c, h_start:h_end, w_start:w_end]
+                    
+                  mask = (x_slice == np.max(x_slice))
+
+                  dx[n, c, h_start:h_end, w_start:w_end] += mask * dout[n, c, h, wo]
+
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
