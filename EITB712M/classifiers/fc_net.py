@@ -78,11 +78,6 @@ class TwoLayerNet(object):
           names to gradients of the loss with respect to those parameters.
         """
         scores = None
-        W1 = self.params['W1']
-        W2 = self.params['W2']
-        b1 = self.params['b1']
-        b2 = self.params['b2']
-        
         ############################################################################
         # TODO: Implement the forward pass for the two-layer net, computing the    #
         # class scores for X and storing them in the scores variable.              #

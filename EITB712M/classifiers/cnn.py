@@ -92,11 +92,6 @@ class ThreeLayerConvNet(object):
         W2, b2 = self.params["W2"], self.params["b2"]
         W3, b3 = self.params["W3"], self.params["b3"]
 
-        # added personal sanity cheks
-        print("Sanity check, W1:", self.params['W1'] is not None)
-        print("Sanity check, W2:", self.params['W2'] is not None)
-        print("Sanity check, W3:", self.params['W3'] is not None)
-
         # pass conv_param to the forward pass for the convolutional layer
         # Padding and stride chosen to preserve the input spatial size
         filter_size = W1.shape[2]

@@ -32,12 +32,6 @@ def affine_relu_backward(dout, cache):
     fc_cache, relu_cache = cache
     da = relu_backward(dout, relu_cache)
     dx, dw, db = affine_backward(da, fc_cache)
-
-    if db is None: 
-        raise ValueError("db is None")
-    if dw is None:
-        raise ValueError("dw is None")
-    
     return dx, dw, db
 
 
@@ -113,10 +107,4 @@ def conv_relu_pool_backward(dout, cache):
     ds = max_pool_backward_fast(dout, pool_cache)
     da = relu_backward(ds, relu_cache)
     dx, dw, db = conv_backward_fast(da, conv_cache)
-    
-    if db is None: 
-        raise ValueError("db is None")
-    if dw is None:
-        raise ValueError("dw is None")
-    
     return dx, dw, db

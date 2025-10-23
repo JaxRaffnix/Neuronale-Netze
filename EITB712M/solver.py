@@ -302,7 +302,6 @@ class Solver(object):
                 if val_acc > self.best_val_acc:
                     self.best_val_acc = val_acc
                     self.best_params = {}
-                    self.best_val_acc = -1
                     for k, v in self.model.params.items():
                         self.best_params[k] = v.copy()
 

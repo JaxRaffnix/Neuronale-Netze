@@ -2,7 +2,6 @@ from builtins import range
 import numpy as np
 
 
-
 def affine_forward(x, w, b):
     """
     Computes the forward pass for an affine (fully-connected) layer.
@@ -22,21 +21,11 @@ def affine_forward(x, w, b):
     - cache: (x, w, b)
     """
     out = None
-    ###########################################################################
-    # TODO: Implement the affine forward pass. Store the result in out. You   #
-    # will need to reshape the input into rows.                               #
-    ###########################################################################
-    # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    N = x.shape[0]
-    x_reshaped = x.reshape(N, -1)
+    dim_size = x[0].shape
+    X = x.reshape(x.shape[0], np.prod(dim_size))
+    out = X.dot(w) + b
 
-    out = np.dot(x_reshaped, w) + b
-
-    # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
     cache = (x, w, b)
     return out, cache
 
@@ -59,27 +48,18 @@ def affine_backward(dout, cache):
     """
     x, w, b = cache
     dx, dw, db = None, None, None
-    ###########################################################################
-    # TODO: Implement the affine backward pass.                               #
-    ###########################################################################
-    # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+    dim_shape = np.prod(x[0].shape)
     N = x.shape[0]
-    x_reshaped = x.reshape(N, -1)
+    X = x.reshape(N, dim_shape)
+    # input gradient
+    dx = dout.dot(w.T)
+    dx = dx.reshape(x.shape)
+    # weight gradient
+    dw = X.T.dot(dout)
+    # bias gradient
+    db = dout.sum(axis=0)
 
-    dx = dout.dot(w.T).reshape(x.shape)
-    dw = x_reshaped.T.dot(dout)
-    db = np.sum(dout, axis=0)
-
-    if db is None: 
-        raise ValueError("db is None")
-    if dw is None:
-        raise ValueError("dw is None")
-
-    # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
     return dx, dw, db
 
 
@@ -95,17 +75,9 @@ def relu_forward(x):
     - cache: x
     """
     out = None
-    ###########################################################################
-    # TODO: Implement the ReLU forward pass.                                  #
-    ###########################################################################
-    # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
     out = np.maximum(0, x)
 
-    # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
     cache = x
     return out, cache
 
@@ -122,18 +94,12 @@ def relu_backward(dout, cache):
     - dx: Gradient with respect to x
     """
     dx, x = None, cache
-    ###########################################################################
-    # TODO: Implement the ReLU backward pass.                                 #
-    ###########################################################################
-    # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    dx = np.where(x > 0, dout, 0)
+    dx = dout * (x > 0)
 
-    # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-    ###########################################################################
-    #                             END OF YOUR CODE                            #
-    ###########################################################################
     return dx
+
+
 
 def conv_forward_naive(x, w, b, conv_param):
     """
@@ -352,6 +318,7 @@ def max_pool_backward_naive(dout, cache):
     #                             END OF YOUR CODE                            #
     ###########################################################################
     return dx
+
 
 
 def svm_loss(x, y):
