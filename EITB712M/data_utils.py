@@ -54,7 +54,7 @@ def get_CIFAR10_data(
     """
     # Load the raw CIFAR-10 data
     cifar10_dir = os.path.join(
-        os.path.dirname(__file__), os.pardir, os.pardir ,"datasets/cifar-10-batches-py"
+        os.path.dirname(__file__), os.pardir, "datasets/cifar-10-batches-py"
     )
     X_train, y_train, X_test, y_test = load_CIFAR10(cifar10_dir)
 
