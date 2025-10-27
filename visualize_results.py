@@ -27,6 +27,7 @@ import torch.nn.functional as F
 from torchviz import make_dot
 import pandas as pd
 import ast
+import hiddenlayer as hl
 
 sns.set_theme("talk")
 
@@ -254,17 +255,127 @@ def show_tsne_embeddings(model, loader, num_samples=2000):
 # -------------------------------------------------------------------------
 # Layer Archiutecture
 # -------------------------------------------------------------------------
-def show_layers(device, model):
-    x = torch.randn(1, 3, 32, 32).to(device)  # dummy input
+def show_layers(device, model, save_dir="images"):
+    """
+    Visualizes the model architecture in multiple ways:
+    1. Full model (simplified, vector graphics)
+    2. First convolutional block
+    3. HiddenLayer graph (clean hierarchical)
+    """
+    x = torch.randn(1, 3, 32, 32).to(device)
     y = model(x)
-    dot = make_dot(y, params=dict(model.named_parameters()), show_attrs=False, show_saved=False)
-    dot.format = 'png'
-    dot.render('images/model_graph')
 
-    block_out = model[:4](x)  # first conv+bn+relu block
-    dot_block = make_dot(block_out, params=dict(model.named_parameters()))
-    dot_block.format = 'png'
-    dot_block.render('images/reduced_graph')
+    # -------------------------------
+    # Full model (simplified)
+    # -------------------------------
+    params = {k: v for k, v in model.named_parameters()}
+    dot = make_dot(y, params=params, show_attrs=False, show_saved=False)
+    dot.format = 'svg'   # zoomable vector graphic
+    dot.render(f'{save_dir}/model_graph', cleanup=True)
+
+    # -------------------------------
+    # First block only
+    # -------------------------------
+    block_out = model[:4](x)  # first Conv+BN+ReLU
+    dot_block = make_dot(block_out, params=dict(model.named_parameters()), show_attrs=False, show_saved=False)
+    dot_block.format = 'svg'
+    dot_block.render(f'{save_dir}/reduced_graph', cleanup=True)
+
+    # -------------------------------
+    # HiddenLayer visualization
+    # -------------------------------
+    hl_graph = hl.build_graph(model, torch.zeros([1, 3, 32, 32])).build_dot()
+    # hl_graph.save(f"{save_dir}/hl_model_graph", format="svg")
+
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle, FancyBboxPatch
+
+def draw_model_layers_zigzag(layers, layer_names=None, figsize=(14,4), savepath=None):
+    """
+    Draw a sequential model in a zig-zag horizontal layout.
+    After MaxPool blocks, the next block goes one row below.
+    """
+    n = len(layers)
+    fig, ax = plt.subplots(figsize=figsize)
+    
+    # coordinates
+    x, y = 0.05, 0.75
+    dx, dy = 0.08, 0.25
+    spacing = 0.04  # horizontal spacing
+    row_shift = 0.35  # vertical shift after MaxPool
+    
+    # Colors per type
+    conv_color = "#a6cee3"
+    pool_color = "#1f78b4"
+    linear_color = "#b2df8a"
+    act_color = "#fb9a99"
+    dropout_color = "#fdbf6f"
+    
+    def get_color(layer_name):
+        l = layer_name.lower()
+        if "conv" in l: return conv_color
+        if "pool" in l: return pool_color
+        if "linear" in l: return linear_color
+        if "relu" in l or "sigmoid" in l: return act_color
+        if "dropout" in l: return dropout_color
+        return "#cccccc"
+    
+    # Track previous coordinates for arrows
+    prev_x, prev_y = x, y
+    
+    for i, layer in enumerate(layers):
+        color = get_color(layer)
+        
+        rect = FancyBboxPatch((x, y-dy/2), dx, dy, linewidth=1,
+                              edgecolor='black', facecolor=color,
+                              boxstyle="round,pad=0.02")
+        ax.add_patch(rect)
+        
+        # Label
+        if layer_names is None:
+            ax.text(x+dx/2, y, layer, ha='center', va='center', fontsize=9)
+        else:
+            ax.text(x+dx/2, y+0.05, layer, ha='center', va='bottom', fontsize=9, weight='bold')
+            ax.text(x+dx/2, y-0.05, layer_names[i], ha='center', va='top', fontsize=8, color='gray')
+        
+        # Draw arrow from previous block
+        if i > 0:
+            ax.annotate('', xy=(x, y), xytext=(prev_x+dx, prev_y),
+                        arrowprops=dict(arrowstyle='->', lw=1.5, color='black'))
+        
+        # If current layer is MaxPool, drop down one row
+        if "pool" in layer.lower():
+            x += dx + spacing
+            prev_x, prev_y = x, y
+            y -= row_shift
+        else:
+            prev_x, prev_y = x, y
+            x += dx + spacing
+    
+    ax.set_xlim(0,1)
+    ax.set_ylim(0,1)
+    ax.axis('off')
+    
+    if savepath:
+        plt.savefig(savepath, bbox_inches='tight')
+    plt.show()
+
+# -----------------------------------
+# Example for your CIFAR-10 model
+layers = [
+    "Conv2d 3→64 5x5", "BatchNorm2d", "ReLU",
+    "Conv2d 64→64 3x3", "BatchNorm2d", "ReLU", "MaxPool2d 2x2",
+    "Conv2d 64→64 3x3", "BatchNorm2d", "ReLU", "MaxPool2d 2x2",
+    "Flatten", "Linear 4096→128", "ReLU", "Dropout", "Linear 128→10"
+]
+
+output_shapes = [
+    "32x32", "32x32", "32x32",
+    "32x32", "32x32", "32x32", "16x16",
+    "16x16", "16x16", "16x16", "8x8",
+    "4096", "128", "128", "128", "10"
+]
+
 
 # -------------------------------------------------------------------------
 # Accuacries
@@ -343,12 +454,13 @@ def show_runtimes(df):
 if __name__ == "__main__":
     print("📊 Generating and saving visualizations to /images ...")
     # show_predictions_grid(model, loader_test)
-    show_confusion_matrix(model, loader_test)
+    # show_confusion_matrix(model, loader_test)
     # visualize_feature_maps(model)
     img, _ = next(iter(loader_test))
     # gradcam(model, img[0:1].to(device))
     # show_tsne_embeddings(model, loader_test)
     # show_layers(device, model)
+    draw_model_layers_zigzag(layers, output_shapes, figsize=(14,4), savepath="images/model_zigzag.pdf")
     # plot_all_trials_accuracies(df)
     # show_runtimes(df)
     # show_learning_rate()
