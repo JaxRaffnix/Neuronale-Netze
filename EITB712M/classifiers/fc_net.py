@@ -84,8 +84,14 @@ class TwoLayerNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        z, cache_z = affine_forward(X, W1, b1)
-        scores, cache_score = affine_relu_forward(z, W2, b2)
+        W1 = self.params['W1']
+        b1 = self.params['b1']
+        W2 = self.params['W2']
+        b2 = self.params['b2']
+        reg = self.reg
+
+        h1, cache1 = affine_relu_forward(X, W1, b1)
+        scores, cache2 = affine_forward(h1, W2, b2)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -97,28 +103,33 @@ class TwoLayerNet(object):
             return scores
         
         # Calculate the loss
-        loss, grads = 0, {}
-        loss, softmax_grad = softmax_loss(scores, y)
-        loss += 0.5 * self.reg * ( np.sum(W1 * W1) + np.sum(W2 * W2) )
+        data_loss, dscores = softmax_loss(scores, y)
+        reg_loss = 0.5 * reg * (np.sum(W1 * W1) + np.sum(W2 * W2))
+        loss = data_loss + reg_loss
         
         ############################################################################
         # TODO: Implement the backward pass for the two-layer net.                 #
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        dz, dw2, db2 = affine_relu_backward(softmax_grad, cache_score)
+        dh1, dW2, db2 = affine_backward(dscores, cache2)
+    
+        # Backprop through first layer (affine -> ReLU)
+        dX, dW1, db1 = affine_relu_backward(dh1, cache1)
 
-        dx, dw1, db1 = affine_backward(dz, cache_z)
-
+        dW1 += reg * W1
+        dW2 += reg * W2
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
         
-        grads['W2'] = dw2 + self.reg * W2
-        grads['b2'] = db2
-        grads['W1'] = dw1 + self.reg * W1
-        grads['b1'] = db1
+        grads = {
+          'W1': dW1,
+          'b1': db1,
+          'W2': dW2,
+          'b2': db2
+        }
         
         return loss, grads

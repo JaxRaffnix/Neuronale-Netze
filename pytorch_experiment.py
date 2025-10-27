@@ -273,6 +273,9 @@ if __name__ == "__main__":
     # _________________________________________________
     # After the model has been trained, get test score
 
+# Best hyperparameters: {'ch1': 64, 'ch2': 128, 'ch3': 64, 'lr': 0.00036203756027455733, 'weight_decay': 1.4247931835872181e-06}
+# Best validation accuracy: 74.80%
+
     finished = False
     if finished:
 

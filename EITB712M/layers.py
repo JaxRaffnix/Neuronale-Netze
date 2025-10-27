@@ -22,9 +22,21 @@ def affine_forward(x, w, b):
     """
     out = None
 
-    dim_size = x[0].shape
-    X = x.reshape(x.shape[0], np.prod(dim_size))
-    out = X.dot(w) + b
+    ###########################################################################
+    # TODO: Implement the affine forward pass. Store the result in out. You   #
+    # will need to reshape the input into rows.                               #
+    ###########################################################################
+    # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+
+    N = x.shape[0]
+    x_reshaped = x.reshape(N, -1)
+
+    out = np.dot(x_reshaped, w) + b
+
+    # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+    ###########################################################################
+    #                             END OF YOUR CODE                            #
+    ###########################################################################
 
     cache = (x, w, b)
     return out, cache
