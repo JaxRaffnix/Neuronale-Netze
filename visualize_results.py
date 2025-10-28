@@ -152,7 +152,7 @@ def savefig(name, ext="pdf", tight=True, transparent=True, dpi=300):
 # -------------------------------------------------------------------------
 # Load trained model
 # -------------------------------------------------------------------------
-model = torch.load("08 best model", weights_only=False)
+model = torch.load("09 best model", weights_only=False)
 model.to(device)
 model.eval()
 
