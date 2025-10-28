@@ -244,6 +244,13 @@ def show_predictions_grid(model, loader, rows=5, cols=8):
         ax.set_xticks([])
         ax.set_yticks([])
 
+        # Hide all spines
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+
+        # Disable grid
+        ax.grid(False)
+
         true, pred = CLASSES[labels[i]], CLASSES[preds[i]]
         color = "green" if pred == true else "red"
         ax.set_title(pred, color=color, fontsize=8.5, pad=2, fontweight="semibold")
@@ -293,7 +300,6 @@ def show_confusion_matrix(model, loader):
     plt.ylabel("True label", labelpad=6)
     plt.xticks(rotation=40, ha="right")   # ✅ readable in 2-column mode
     plt.yticks(rotation=0, va="center")   # ✅ TODO solved
-    plt.title("Normalized Confusion Matrix", pad=10)
 
     # --- Layout and save ---
     plt.tight_layout(pad=0.5)
@@ -567,7 +573,7 @@ df_expanded = pd.concat([
     ], ignore_index=True)
 best_trial = df.loc[df['val_acc'].idxmax(), 'trial']
 
-def plot_all_trials_accuracies(df):
+def plot_accuracies(df):
     """
     Plots training and validation accuracy curves for all trials, 
     highlighting the best trial.
@@ -592,6 +598,55 @@ def plot_all_trials_accuracies(df):
     ax[1].set_xlabel("Epoch"); ax[1].set_ylabel("Accuracy")
     savefig("all_trials_accuracy")
 
+def plot_accuracies_csv(csv_path):
+    """
+    Loads Optuna results from a CSV and plots training and validation accuracies for all trials.
+    Highlights the best trial based on final validation accuracy.
+    """
+    # Load and parse lists
+    df = pd.read_csv(csv_path)
+    for col in ["train_accs", "val_accs", "lrs"]:
+        df[col] = df[col].apply(ast.literal_eval)
+
+    # Expand into long format
+    records = []
+    for _, row in df.iterrows():
+        n_epochs = len(row["train_accs"])
+        for epoch in range(n_epochs):
+            records.append({
+                "trial": row["trial"],
+                "epoch": epoch + 1,
+                "train_acc": row["train_accs"][epoch],
+                "val_acc": row["val_accs"][epoch],
+                "lr": row["lrs"][epoch],
+                "val_acc_final": row["val_acc"],  # for identifying best
+            })
+
+    df_expanded = pd.DataFrame(records)
+
+    # Identify best trial (highest final val_acc)
+    best_trial = df_expanded.loc[df_expanded.groupby("trial")["val_acc_final"].first().idxmax(), "trial"]
+
+    # --- Plot ---
+    fig, ax = plt.subplots(1, 2, sharey=True)
+
+    sns.lineplot(data=df_expanded, x="epoch", y="train_acc", hue="trial",
+                 alpha=0.3, legend=False, ax=ax[0])
+    sns.lineplot(data=df_expanded, x="epoch", y="val_acc", hue="trial",
+                 alpha=0.3, legend=False, ax=ax[1])
+
+    # Highlight best trial
+    sns.lineplot(data=df_expanded[df_expanded.trial == best_trial],
+                 x="epoch", y="train_acc", color="red", lw=2, ax=ax[0], label="Best trial")
+    sns.lineplot(data=df_expanded[df_expanded.trial == best_trial],
+                 x="epoch", y="val_acc", color="red", lw=2, ax=ax[1], label="Best trial")
+
+    ax[0].set_title("Training Accuracy")
+    ax[1].set_title("Validation Accuracy")
+    for a in ax:
+        a.set_xlabel("Epoch")
+        a.set_ylabel("Accuracy")
+    savefig("all_trials_accuracy")
 
 # -------------------------------------------------------------------
 # 2️⃣ show_learning_rate
@@ -621,9 +676,10 @@ def show_runtimes(df):
 # -------------------------------------------------------------------------
 if __name__ == "__main__":
     print("📊 Generating and saving visualizations to /images ...")
-    # show_predictions_grid(model, loader_test)
+    show_predictions_grid(model, loader_test)
     # show_confusion_matrix(model, loader_test)
-    plot_all_trials_accuracies(df)
+    # plot_accuracies(df)
+    # plot_accuracies_csv("results_merged.csv")
     # show_runtimes(df)
     # plot_optuna(palette, FIGSIZE, plotly_template, IMG_DIR, study)
     print("✅ All visualizations saved in the 'images' folder.")
