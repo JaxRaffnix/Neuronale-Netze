@@ -1,3 +1,39 @@
 {
-    "python-envs.pythonProjects": []
+  "latex-workshop.latex.recipes": [
+    {
+        "name": "latexmk (xelatex)",
+        "tools": [
+            "xelatexmk"
+        ]
+    },
+    {
+        "name": "xelatex + biber + xelatex x2",
+        "tools": [
+            "xelatexmk",
+            "biber",
+            "xelatexmk",
+            "xelatexmk",
+        ]
+    },
+  ],
+  "latex-workshop.latex.tools": [
+    {
+        "name": "xelatexmk",
+        "command": "latexmk",
+        "args": [
+            "-synctex=1",
+            "-interaction=nonstopmode",
+            "-file-line-error",
+            "-xelatex",
+            "-outdir=%OUTDIR%",
+            "%DOC%"
+        ],
+        "env": {}
+    },
+    {
+        "name": "biber",
+        "command": "biber",
+        "args": ["%OUTDIR%/%DOCFILE%"]
+        },
+  ]
 }

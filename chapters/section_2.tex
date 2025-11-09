@@ -1,0 +1,75 @@
+\section{Eigenes Modell zu CIFAR 10}
+
+%___________________________________________________________________
+
+\begin{frame}{Aufgabenstellung}
+    \begin{itemize}
+        \item \textbf{Aufgabe:} Klassifikation von CIFAR-10 Bildern
+        \item \textbf{Datensatz:}
+            \begin{itemize}
+                \item 10 Klassen
+                \item 60.000 Bilder, Größe $32\times32\times3$
+                \item Trainingsset: 49.000 Bilder
+                \item Validierungsset: 1.000 Bilder
+                \item Testset: 10.000 Bilder
+            \end{itemize}
+        \item \textbf{Ziel:} Modell in \emph{maximal 10 Epochen} trainieren, um Bilder korrekt zu klassifizieren
+    \end{itemize}
+\end{frame}
+
+%___________________________________________________________________
+
+\begin{frame}{Architektur des Modells}
+    \begin{figure}
+        \centering
+        \includegraphics[width=\imagewidth, height=\imageheight, keepaspectratio]{model_architecure}
+        \caption{Architektur des eigenen CNN-Modells.}
+    \end{figure}
+\end{frame}
+
+%___________________________________________________________________
+
+\begin{frame}{Ergebnisse des besten Modells}
+\begin{itemize}
+    \item \textbf{Beste Hyperparameter:}
+        \begin{itemize}
+            \item ch1 = 64, ch2 = 64, ch3 = 64
+            \item Lernrate = 8.6e-4
+            \item Weight Decay = 3.81e-6
+        \end{itemize}
+    \item \textbf{Best Validation Accuracy:} \alert{75.70\%}
+    \item \textbf{Trainings-Accuracy:} \alert{73\%}
+    \item \textbf{Test Accuracy:} \alert{75.05\%}
+\end{itemize}
+\end{frame}
+
+%___________________________________________________________________
+
+\begin{frame}{Accuracy für verschiedene Klassen}
+    \begin{figure}
+        \centering
+        \includegraphics[width=\imagewidth, height=\imageheight, keepaspectratio]{class_accuracy.pdf}
+        \caption{Test Accuracy für verschiedene Klassen.}
+    \end{figure}
+\end{frame}
+
+%___________________________________________________________________
+
+\begin{frame}{Confusion Matrix}
+    \begin{figure}
+        \centering
+        \includegraphics[width=\imagewidth, height=\imageheight, keepaspectratio]{confusion_matrix.pdf}
+        \caption{Normierte Confusion Matrix für das Testset.}
+    \end{figure}
+\end{frame}
+
+%___________________________________________________________________
+
+\begin{frame}{Beispielvorhersagen}
+    \begin{figure}
+        \centering
+        \includegraphics[width=\imagewidth, height=0.8\imageheight, keepaspectratio]{predictions_grid.pdf}
+        \caption{Beispielhafte Vorhersagen des Modells.}
+        \imagelegend{Korrekte Klasse: grün. Falsche Klasse: rot.}
+    \end{figure}
+\end{frame}
