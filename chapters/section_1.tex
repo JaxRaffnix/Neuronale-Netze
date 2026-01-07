@@ -1,0 +1,34 @@
+\section{Allgemeines zu PyTorch}
+
+%___________________________________________________________________
+
+\begin{frame}{PyTorch im Überblick}
+    \begin{columns}[T,onlytextwidth]
+        \column{0.5\textwidth}
+        \textbf{Was ist PyTorch?}
+        \begin{itemize}
+            \item Python-Bibliothek für Deep Learning
+            \item Stark verbreitet in Forschung und Lehre \cite{bauer}
+            \item Unterstützt dynamische Berechnungsgraphen („Define-by-Run“)
+        \end{itemize}
+
+        \column{0.5\textwidth}
+        \textbf{Warum PyTorch?}
+        \begin{itemize}
+            \item Einfache und flexible Modellimplementierung
+            \item Direkte Nutzung von GPU-Beschleunigung
+            \item Große Community, viele Tutorials und Ressourcen
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+%___________________________________________________________________
+
+\begin{frame}{Grundlegende Konzepte von Pytorch}
+    \begin{description}
+        \item[Autograd] Berechnet Gradienten automatisch für Backpropagation
+        \item[\texttt{nn.Module}] Basis für selbstdefinierte Modelle, enthält vordefinierte Layers
+        \item[DataLoader] Einfaches Laden, Batchen und \alert{Parallelisieren} von Datensätzen
+        \item[Optimizer] Vorgefertigte Optimierer, z.B. \texttt{Adam}
+    \end{description}
+\end{frame}

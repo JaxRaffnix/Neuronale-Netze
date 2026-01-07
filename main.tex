@@ -1,0 +1,288 @@
+% !TeX program = xelatex
+
+%___________________________________________________________________
+% Load Class
+
+\documentclass[
+  fontsize=10pt, 
+  aspectratio=169,
+  xcolor={dvipsnames}
+]{beamer}
+% beamer auto loads hyperref, color, xcolor, amsthm
+
+%___________________________________________________________________
+% Load Packages
+
+% \usepackage[T1]{fontenc}        % * only if font supports T1 *
+% \usepackage[utf8]{inputenc}     % * redundant for modern latex versions *
+
+\usepackage{fontspec}               % required for system fonts
+\usepackage{microtype}         % better typography
+\usepackage{polyglossia}    % languages
+
+% \usepackage{enumitem}
+
+\usepackage{animate}
+
+% citations
+\usepackage[
+  backend=biber,              
+  style=ieee,                 
+]{biblatex}   
+\usepackage[
+  autostyle=true, 
+  german=quotes
+]{csquotes}
+
+% better unit display
+\usepackage[
+  locale=DE,
+  mode=match,
+  % per-mode-fraction,
+  range-units=repeat,
+  range-phrase={{~bis~}}
+]{siunitx}
+
+\usepackage{amsmath}
+
+% input external data
+\usepackage{listings}
+\usepackage{graphicx} 
+\usepackage{svg}
+
+% improve visualization of data
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{subcaption}	
+
+\usepackage{appendixnumberbeamer}
+
+\usetheme[]{metropolis}     % beamer style
+
+%___________________________________________________________________
+% Dimensions
+
+\newlength{\imagewidth}
+\setlength{\imagewidth}{1\columnwidth}
+
+\newlength{\imageheight}
+\setlength{\imageheight}{0.85\textheight}
+
+%___________________________________________________________________
+% Colors
+
+\definecolor{colorblue}{HTML}{0480CC}				% color for weblinks
+\definecolor{colordarkblue}{HTML}{4C1DCC}			% no use case at the moment
+\definecolor{colorgreen}{HTML}{26CC1B}				% color for citations
+\definecolor{colorred}{HTML}{CC1204}				% color for pdf links
+\definecolor{coloryellow}{HTML}{F0B707}			    % color for warnings
+
+%___________________________________________________________________
+% New Makros
+
+\newcommand{\imagesource}[1]{\par\footnotesize\textbf{Quelle:}~#1}   	%   Quellen für Bilder
+\newcommand{\imagelegend}[1]{\par\footnotesize\textbf{Legende:}~#1}
+
+\newcommand{\missing}{%
+    \textcolor{coloryellow}{MISSING}%
+    \PackageWarning{JHstyle}{You used the 'missing' macro at this line. Remove it before finalising document}%
+}
+\newcommand{\improve}{%
+    \textcolor{coloryellow}{IMPROVE}%
+    \PackageWarning{JHstyle}{You used the 'improve' macro at this line. Remove it before finalising document}%
+}
+
+%___________________________________________________________________
+% Renamings
+
+\renewcommand{\lstlistingname}{Quellcode}						%	Snippet umbenennen
+\renewcommand{\lstlistlistingname}{Codeverzeichnis}	
+
+\addto\captionsgerman{%
+  \renewcommand{\proofname}{Beweis}
+}
+
+\renewcommand{\mkcitation}[1]{#1}
+
+%___________________________________________________________________
+% Commands
+
+\setdefaultlanguage{german}
+\setotherlanguage{english}
+
+\addbibresource{sources.bib}
+
+\graphicspath{{images/}}  
+
+\hypersetup{
+%   hidelinks,
+  colorlinks=true,
+  linkcolor=.,
+  anchorcolor=.,
+  % citecolor=green,
+  % filecolor=magenta,      
+  urlcolor=colorblue,
+  bookmarksnumbered=true,
+  breaklinks=true,
+  pdfauthor=Jan Hoegen,
+  pdftitle=Pytorch NNB
+}
+
+%___________________________________________________________________
+% Listings
+
+\lstset{%
+	frame			=	tb ,							%	horizontale Linie oben&unten
+	breaklines		=	true,							%	Zeilenumbruch
+	rulecolor		=	\color{black} ,					%	Rahmenfarbe ist schwarz
+	keywordstyle	=	\color{colorblue} ,
+	commentstyle	=	\color{colorblue} ,
+	stringstyle		=	\color{colorblue} ,
+	title			=	\lstname ,						%	Titel ist gleich dem Dateinamen
+	basicstyle		=	\footnotesize\ttfamily ,		%	Kleine Schrift und Monospace
+	numbers			=	left,							%	Zeilennumber links
+	inputencoding	=	utf8,  							% Input encoding
+  extendedchars	=	true,  							% Extended ASCII
+}
+
+%___________________________________________________________________
+% Ttile Page
+
+\title{CIFAR10 mit PyTorch klassifizieren}
+\subtitle{Neuronale Netze in der Bildverarbeitung}
+\date{\today}
+\author{Jan Hoegen \and Nico Weber}
+\institute{
+  Hochschule Karlsruhe\\
+  University of Applied Sciences
+}
+% \setbeamertemplate{frame footer}{CIFAR10 mit PyTorch klassifizieren. Jan Hoegen, Nico Weber}
+
+%___________________________________________________________________
+% Document
+
+\begin{document}
+  \maketitle
+
+  \begin{frame}{Inhaltsverzeichnis}
+    \setbeamertemplate{section in toc}[sections numbered]
+    \tableofcontents[hideallsubsections]
+    % \tableofcontents
+  \end{frame}
+
+  \input{chapters/section_1.tex}
+
+  \input{chapters/section_2.tex}
+
+  \input{chapters/section_3.tex}
+
+  \input{chapters/section_4.tex}
+
+  \input{chapters/section_5.tex}
+
+%   \begin{frame}{Blocks}
+%   Three different block environments are pre-defined and may be styled with an
+%   optional background color.
+
+%   \begin{columns}[T,onlytextwidth]
+%     \column{0.5\textwidth}
+%       \begin{block}{Default}
+%         Block content.
+%       \end{block}
+
+%       \begin{alertblock}{Alert}
+%         Block content.
+%       \end{alertblock}
+
+%       \begin{exampleblock}{Example}
+%         Block content.
+%       \end{exampleblock}
+
+%     \column{0.5\textwidth}
+
+%       \metroset{block=fill}
+
+%       \begin{block}{Default}
+%         Block content.
+%       \end{block}
+
+%       \begin{alertblock}{Alert}
+%         Block content.
+%       \end{alertblock}
+
+%       \begin{exampleblock}{Example}
+%         Block content.
+%       \end{exampleblock}
+
+%   \end{columns}
+% \end{frame}
+
+% \section{Second Section}
+%   \begin{frame}{Second Frame}
+%       The theme provides sensible defaults to
+% \emph{emphasize} text, \alert{accent} parts
+% or show \textbf{bold} results.
+%   \end{frame}
+
+%   \begin{frame}{References}
+%   Some references to showcase [allowframebreaks] \cite{Knuth92,ConcreteMath,Simpson,Er01,greenwade93}
+%   \cite{ConcreteMath}
+% \end{frame}
+
+% \begin{frame}{Animation}
+%   \begin{itemize}[<+- | alert@+>]
+%     \item \alert<4>{This is\only<4>{ really} important}
+%     \item Now this
+%     \item And now this
+%   \end{itemize}
+% \end{frame}
+
+%___________________________________________________________________
+\begin{frame}[label=conclusion, standout]
+  Fragen?
+\end{frame}
+
+\appendix
+
+%___________________________________________________________________
+\begin{frame}{Literatur}
+  \nocite{*}
+  \printbibliography[heading=none]
+\end{frame}
+
+%___________________________________________________________________
+\begin{frame}[allowframebreaks]{Wichtige Konzepte im Training}
+
+
+\textbf{Regularisierung:}
+\begin{itemize}
+    \item \textbf{Dropout:} Deaktiviert zufällig Neuronen während des Trainings, um Overfitting zu reduzieren und die Generalisierung zu verbessern.
+    \item \textbf{Weight Decay:} Fügt einen Strafterm für große Gewichte hinzu und verhindert dadurch übermäßig komplexe Modelle.
+\end{itemize}
+
+\textbf{Feature-Reduktion:}
+\begin{itemize}
+    \item \textbf{MaxPooling:} Verringert die räumliche Auflösung von Feature-Maps, indem pro Bereich nur der größte Aktivierungswert beibehalten wird.  
+    Reduziert Rechenaufwand und sorgt für Translationstoleranz (robuster gegenüber kleinen Verschiebungen im Bild).
+\end{itemize}
+
+\textbf{Optimierung:}
+\begin{itemize}
+    \item \textbf{Adam:} Optimierer, der Momentum und RMSProp kombiniert. Passt die Lernrate adaptiv für jedes Gewicht an.
+    \item \textbf{Learning Rate:} Schrittweite, mit der die Gewichte in Richtung des Gradienten aktualisiert werden.  
+    Zu groß → instabil, zu klein → langsames Lernen.
+\end{itemize}
+
+\end{frame}
+
+% \improve{bessere farbpalette parallel_coordinate}
+%___________________________________________________________________
+\begin{frame}
+  \begin{figure}
+    \centering
+    \includegraphics[width=\imagewidth, height=\imageheight, keepaspectratio]{parallel_coordinate.png}
+  \end{figure}
+\end{frame}
+
+\end{document}
