@@ -1,17 +1,27 @@
 # Neuronale Netze in der Bildverarbeitung
 
-Vorlesung von Prof. Bauer an der Hochschule Karlsruhe. Anlehnung an die Stanford CS class [cs231n](https://cs231n.github.io/) von [Justin Johnson](https://web.eecs.umich.edu/~justincj/).
+Dieses Projekt entschand im Rahmen der Vorlesung "Neuronale Netze" bei Prof. Jan Bauer an der Hochschule Karslsruhe. Der Inhalt ist an die Stanford CS class [cs231n](https://cs231n.github.io/) von [Justin Johnson](https://web.eecs.umich.edu/~justincj/) angelehnt.
+
+Ziel ist, mit verschiedenen Methoden den [CIFAR10](https://www.cs.toronto.edu/~kriz/cifar.html) Datensatz zu klassifizieren. Darüber hinaus wird der knn Algorithmus, Multiclass Support Vector Machines, Transfer Learning, semantische Segmentierung und Style Transfer behandelt, [Kaggle](https://www.kaggle.com/competitions/dogs-vs-cats) betrachtet.
+
+Einige Codebestandteile sind durch die cs231n bereits vorgeeben, doch die relevante Implementierung (solver, classifiers, layers, backpropagation, …) musste selbst erstellt werden. 
+
+## Beispiel
+
+Im [notebooks/09_PyTorch.ipynb](notebooks/09_PyTorch.ipynb) wurde mithilfe von Pytorch der CIFAR10 Datensatz klassifiziert. Dazu wurde ein eigenen Modell erstellt und Baseian Search zur Hyperparameteroptimierung verwendet. Für Details zu Bayesian Search siehe den talk zu [Optimierungsverfahren](https://github.com/JaxRaffnix/Optimierungsverfahren/blob/main/build/talk.pdf).
+
+<object data="talk/images/predictions_grid.pdf" type="application/pdf" width="1400px" height="700px">
+    <embed src="talk/images/predictions_grid.pdf">
+        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="talk/images/predictions_grid.pdf">Download PDF</a>.</p>
+    </embed>
+</object>
 
 
-Eigene Präsentation eines Moells unter [talk/Präsentation Pytorch.pdf](talk/Präsentation%20Pytorch.pdf)
+![Matrix](<talk/images/class_accuracy.pdf>)
 
-## Inhalt
+![talk/images/all_trials_accuracy.png](talk/images/all_trials_accuracy.png)
 
-- Notebooks mit Theorie, Aufgaben und Loesungen: [notebooks/](notebooks/)
-- Python-Implementierungen (Layer, Solver, Utils): [src/EITB712M/](src/EITB712M/)
-- Datensaetze (CIFAR-10, Hymenoptera, Kaggle Cats vs Dogs): [data/](data/)
-- Ergebnisse und Modelle: [artifacts/](artifacts/)
-- Vortrag und Quellen: [talk/](talk/)
+Eine Präsentation zu diesem Thema findet sich unter [talk/Präsentation Pytorch.pdf](talk/Präsentation%20Pytorch.pdf)
 
 ## Notebooks
 
@@ -27,45 +37,3 @@ Eigene Präsentation eines Moells unter [talk/Präsentation Pytorch.pdf](talk/Pr
 - [notebooks/10_TransferLearning.ipynb](notebooks/10_TransferLearning.ipynb)
 - [notebooks/11_SemantischeSegmentierung.ipynb](notebooks/11_SemantischeSegmentierung.ipynb)
 - [notebooks/12_StyleTransfer.ipynb](notebooks/12_StyleTransfer.ipynb)
-
-## Schnellstart
-
-Voraussetzung: Python >= 3.14 (laut [pyproject.toml](pyproject.toml)).
-
-1) Virtuelle Umgebung erstellen und aktivieren
-
-```bash
-python -m venv .venv
-```
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-2) Abhaengigkeiten installieren
-
-```bash
-pip install -e .
-```
-
-Optional mit uv:
-
-```bash
-uv sync
-```
-
-3) Jupyter Notebook starten
-
-```bash
-jupyter notebook
-```
-
-## Daten
-
-Die Datensaetze liegen unter [data/](data/). CIFAR-10 ist bereits enthalten, weitere Datensaetze (Hymenoptera, Kaggle Cats vs Dogs) sind dort strukturiert abgelegt. Falls du eigene Daten nutzt, lege sie in einem neuen Unterordner unter [data/](data/) ab.
-
-## Ergebnisse
-
-Beispielgrafik der Accuracy aus Kapitel 9: ![talk/images/all_trials_accuracy.png](talk/images/all_trials_accuracy.png)
-
-Trainierte Modelle und Artefakte befinden sich unter [artifacts/](artifacts/).
